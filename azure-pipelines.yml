@@ -24,6 +24,13 @@ steps:
     npm run build
   displayName: 'npm install and build'
 
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish build artifacts'
+  inputs:
+    PathtoPublish: 'build'        # 要发布的本地目录
+    ArtifactName: 'drop'          # 给这个 artifact 起个名字（如 drop, www, dist）
+    publishLocation: 'Container'  # 存到 Azure Pipelines 的存储（默认）
+
 - script: |
     npm install -g vercel@latest
     vercel --version
