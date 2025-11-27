@@ -1,0 +1,38 @@
+# Node.js with React
+# Build a Node.js project that uses React.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+
+variables:
+- group: vercel-secrets 
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install
+    npm run build
+  displayName: 'npm install and build'
+
+- script: |
+    npm install -g vercel@latest
+    vercel --version
+  displayName: 'Install Vercel CLI'
+
+- script: |
+    echo "Deploying to Vercel..."
+    vercel --token $(VERCEL_TOKEN) --prod --yes
+  displayName: 'Deploy to Vercel'
+
+  env:
+    VERCEL_TOKEN: $(VERCEL_TOKEN)
