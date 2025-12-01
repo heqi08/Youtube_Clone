@@ -1,0 +1,45 @@
+name: Deploy React App to Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'  # 自动缓存 node_modules，加速后续构建
+
+      # 3. 安装依赖并构建
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
+
+      # （可选）4. 上传构建产物作为 Artifact（仅用于调试/人工下载）
+      - name: Upload build artifact (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: drop
+          path: build/
+
+      # 5. 安装 Vercel CLI 并部署
+      - name: Install Vercel CLI and deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          npm install -g vercel@latest
+          vercel --version
+          echo "Deploying to Vercel..."
+          vercel --prod --token "$VERCEL_TOKEN" --yes
